@@ -1,0 +1,27 @@
+﻿@model List<JournalEntry>
+@{
+    var prompt = ViewBag.Prompt as Prompt;
+}
+
+<div class="alert alert-success p-4">
+    <h3><b>Daily Prompt</b></h3>
+    <p>@prompt?.Text</p>
+</div>
+
+<h2>Últimas entradas públicas</h2>
+
+@if (!Model.Any())
+{
+    <p>No hay notas públicas aún.</p>
+}
+else
+{
+    foreach (var entry in Model)
+    {
+        <div class="card p-3 mt-3">
+            <h4>@entry.Title</h4>
+            <p>@entry.Content</p>
+            <small>@entry.UserDisplayName — @entry.CreatedAt.ToString("g")</small>
+        </div>
+    }
+}

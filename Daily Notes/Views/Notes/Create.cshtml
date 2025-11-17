@@ -1,0 +1,16 @@
+@model JournalEntry
+
+<h2>Crear nueva nota</h2>
+
+<form method="post">
+    <label>Título</label>
+    <input class="form-control" name="Title" />
+
+    <label>Contenido</label>
+    <textarea class="form-control" name="Content"></textarea>
+
+    <label>¿Es pública?</label>
+    <input type="checkbox" name="IsPublic" />
+
+    <button class="btn btn-success mt-3">Guardar</button>
+</form>

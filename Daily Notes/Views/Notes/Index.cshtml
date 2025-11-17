@@ -1,0 +1,14 @@
+@model List<JournalEntry>
+
+<h2>Notas</h2>
+
+<a class="btn btn-primary" href="/Notes/Create">Crear nueva nota</a>
+
+@foreach (var n in Model)
+{
+    <div class="card p-3 mt-3">
+        <h4>@n.Title</h4>
+        <p>@n.Content</p>
+        <small>@n.UserDisplayName — @n.CreatedAt.ToString("g")</small>
+    </div>
+}
