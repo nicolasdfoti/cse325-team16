@@ -1,0 +1,44 @@
+@page "/newentry"
+@using DailyNotes.Services
+@inject EntryService entryService
+
+@inject NavigationManager nav
+
+<h2 class="page-title">Nueva Entrada</h2>
+
+<div class="form-box">
+    <label>Título</label>
+    <input class="text-input" @bind="title" />
+
+    <label>Contenido</label>
+    <textarea class="text-area" rows="8" @bind="content"></textarea>
+
+    <label class="switch-label">
+        <input type="checkbox" @bind="isPublic" />
+        <span>Hacer pública</span>
+    </label>
+
+    <button class="primary-btn" @onclick="SaveEntry">Guardar Entrada</button>
+</div>
+
+@code {
+    string title = "";
+    string content = "";
+    bool isPublic = false;
+
+    async Task SaveEntry()
+    {
+        var newEntry = new Entry
+        {
+            Title = title,
+            Content = content,
+            IsPublic = isPublic,
+            CreatedAt = DateTime.Now
+        };
+
+        await entryService.SaveEntryAsync(newEntry);
+
+        // Redirigir a otra página si quieres
+        nav.NavigateTo("/profile");
+    }
+}

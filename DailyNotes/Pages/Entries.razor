@@ -1,0 +1,33 @@
+@page "/entries"
+@using DailyNotes.Models
+
+<h2 class="page-title">My Entries</h2>
+
+<div class="entry-list">
+    @foreach (var entry in entries)
+    {
+        <div class="entry-card">
+            <h4>@entry.Title</h4>
+            <p>@entry.Preview</p>
+            <small>@entry.Date.ToShortDateString()</small>
+
+            <div class="card-actions">
+                <a href="/editentry/@entry.Id" class="secondary-btn">Edit</a>
+                <button class="danger-btn">Delete</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    public List<Entry> entries = new() {
+        new Entry { Id = 1, Title="My day", Preview="Today I felt better because...", Date=DateTime.Now }
+    };
+
+public class Entry {
+    public int Id { get; set; }
+    public string Title { get; set; } = "";
+    public string Preview { get; set; } = "";
+    public DateTime Date { get; set; }
+}
+}

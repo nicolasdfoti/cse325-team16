@@ -1,0 +1,37 @@
+﻿@page "/"
+@inject NavigationManager Navigation
+
+<h1 class="homepage-title">Welcome to Daily Notes</h1>
+<p class="homepage-subtitle">A safe space to write, heal, and grow one day at a time ✨</p>
+
+<!-- HERO SECTION -->
+<div class="hero-container">
+
+    <button class="primary-btn hero-cta-left" @onclick="GoToPrompt">
+        Go to Daily Prompt
+    </button>
+
+    <img src="sample-data/hero.png" alt="Welcome" class="hero-image-full" />
+</div>
+
+<!-- MOST POPULAR SECTION -->
+<h2 class="section-title">🔥 Most Popular Entries This Week</h2>
+
+<div class="horizontal-scroll">
+    @for (int i = 1; i <= 3; i++)
+    {
+        <div class="entry-card">
+            <h3>Entry Title @i</h3>
+            <p>Short preview of the public entry…</p>
+
+            <button class="secondary-btn">View</button>
+        </div>
+    }
+</div>
+
+@code {
+    void GoToPrompt()
+    {
+        Navigation.NavigateTo("/newentry");
+    }
+}

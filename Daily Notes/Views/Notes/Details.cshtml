@@ -1,7 +1,0 @@
-@model JournalEntry
-<h2>@Model.Title</h2>
-<p>@Model.Content</p>
-<small>
-    Por: @(Model.User?.Username ?? Model.UserId.ToString())
-    — @Model.CreatedAt.ToLocalTime().ToString("g")
-</small>

@@ -1,0 +1,32 @@
+ @using DailyNotes.Services
+@page "/public"
+@inject EntryService entryService
+
+<h2 class="page-title">Public Entries</h2>
+
+@if (publicEntries == null)
+{
+    <p>Loading...</p>
+}
+else if (!publicEntries.Any())
+{
+    <p>No public entries available.</p>
+}
+else
+{
+    <ul>
+        @foreach (var entry in publicEntries)
+        {
+            <li>@entry.Title</li>
+        }
+    </ul>
+}
+
+@code {
+    List<Entry>? publicEntries;
+
+    protected override async Task OnInitializedAsync()
+    {
+        publicEntries = await entryService.GetPublicEntriesAsync();
+    }
+}

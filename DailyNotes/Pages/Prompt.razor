@@ -1,0 +1,12 @@
+@page "/prompt"
+
+<h2 class="page-title">Daily Prompt</h2>
+<p class="prompt-box">
+    @dailyPrompt
+</p>
+
+<a class="primary-btn" href="/newentry">Write My Entry</a>
+
+@code {
+    public string dailyPrompt = "What emotion dominated your day and why?";
+}
