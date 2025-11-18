@@ -1,5 +1,8 @@
 ﻿@page "/"
+@using DailyNotes.Services
+@using DailyNotes.Models
 @inject NavigationManager Navigation
+@inject EntryService entryService
 
 <h1 class="homepage-title">Welcome to Daily Notes</h1>
 <p class="homepage-subtitle">A safe space to write, heal, and grow one day at a time ✨</p>
@@ -17,21 +20,54 @@
 <!-- MOST POPULAR SECTION -->
 <h2 class="section-title">🔥 Most Popular Entries This Week</h2>
 
-<div class="horizontal-scroll">
-    @for (int i = 1; i <= 3; i++)
-    {
-        <div class="entry-card">
-            <h3>Entry Title @i</h3>
-            <p>Short preview of the public entry…</p>
+@if (topEntries == null || !topEntries.Any())
+{
+    <p>No public entries yet.</p>
+}
+else
+{
+    <div class="horizontal-scroll">
+        @foreach (var entry in topEntries)
+        {
+            <div class="entry-card">
+                <h3>@entry.Title</h3>
 
-            <button class="secondary-btn">View</button>
-        </div>
-    }
-</div>
+                <p>@(entry.Content.Length > 70 
+                    ? entry.Content.Substring(0, 70) + "..." 
+                    : entry.Content)</p>
+
+                <p>❤️ @entry.Likes likes</p>
+
+                <button class="secondary-btn" @onclick="() => ViewEntry(entry.Id)">
+                    View
+                </button>
+            </div>
+        }
+    </div>
+}
 
 @code {
+    List<Entry> topEntries = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var publicEntries = await entryService.GetPublicEntriesAsync();
+
+        // Ordenamos por Likes y tomamos las 5 mejores
+        topEntries = publicEntries
+            .OrderByDescending(e => e.Likes)
+            .Take(5)
+            .ToList();
+    }
+
     void GoToPrompt()
     {
         Navigation.NavigateTo("/newentry");
+    }
+
+    void ViewEntry(int id)
+    {
+        // ✔️ ESTA ES LA RUTA CORRECTA
+        Navigation.NavigateTo($"/view/{id}");
     }
 }

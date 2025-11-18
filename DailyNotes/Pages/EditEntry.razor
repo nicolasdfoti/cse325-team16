@@ -1,27 +1,50 @@
 @page "/editentry/{id:int}"
 @using DailyNotes.Models
+@using DailyNotes.Services
+@inject EntryService entryService
+@inject NavigationManager nav
 
 <h2 class="page-title">Edit Entry</h2>
 
-<div class="form-box">
-    <label>Title</label>
-    <input class="text-input" @bind="title" />
+@if (entry == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="form-box">
+        <label>Title</label>
+        <input class="text-input" @bind="entry.Title" />
 
-    <label>Content</label>
-    <textarea class="text-area" rows="8" @bind="content"></textarea>
+        <label>Content</label>
+        <textarea class="text-area" rows="8" @bind="entry.Content"></textarea>
 
-    <label class="switch-label">
-        <input type="checkbox" @bind="isPublic" />
-        <span>Make Public</span>
-    </label>
+        <label class="switch-label">
+            <input type="checkbox" @bind="entry.IsPublic" />
+            <span>Public</span>
+        </label>
 
-    <button class="primary-btn">Update Entry</button>
-</div>
+        <button class="primary-btn" @onclick="UpdateEntry">Update Entry</button>
+    </div>
+}
 
 @code {
     [Parameter] public int id { get; set; }
 
-    string title = "Existing entry";
-    string content = "Current content...";
-    bool isPublic = true;
+    Entry? entry;
+
+    protected override async Task OnInitializedAsync()
+    {
+        entry = await entryService.GetEntryByIdAsync(id);
+    }
+
+  async Task UpdateEntry()
+{
+    if (entry is null)
+        return;
+
+    await entryService.UpdateEntryAsync(entry);
+    nav.NavigateTo("/entries");
+}
+
 }
