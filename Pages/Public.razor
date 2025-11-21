@@ -15,7 +15,7 @@
         <div class="entry-card">
             <h3>@entry.Title</h3>
             <p>@(entry.Content.Length > 150 ? entry.Content[..150] + "..." : entry.Content)</p>
-            <small>Publicado: @entry.CreatedAt.ToShortDateString()</small>
+            <small>Published: @entry.CreatedAt.ToShortDateString()</small>
 
             <div class="reaction-buttons">
                 <button class="primary-btn" @onclick="() => Like(entry.Id)">👍 @entry.Likes</button>
@@ -23,11 +23,11 @@
             </div>
 
             <div class="comments-section">
-                <h4>Comentarios</h4>
+                <h4>Comments</h4>
 
                 @if (!entry.Comments.Any())
                 {
-                    <p>No hay comentarios aún.</p>
+                    <p>No comments yet.</p>
                 }
                 else
                 {
@@ -42,7 +42,7 @@
                 }
 
                 <textarea @bind="newCommentText[entry.Id]" class="text-area"></textarea>
-                <button class="secondary-btn" @onclick="() => AddComment(entry.Id)">💬 Comentar</button>
+                <button class="secondary-btn" @onclick="() => AddComment(entry.Id)">💬 Comment</button>
             </div>
         </div>
     }
