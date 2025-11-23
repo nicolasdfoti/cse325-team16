@@ -1,0 +1,68 @@
+﻿@page "/"
+@using DailyNotes.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject DailyNotes.Services.UserService UserService
+
+<h1 class="homepage-title">Welcome to Daily Notes</h1>
+<p class="homepage-subtitle">A safe space to write, heal, and grow one day at a time ✨</p>
+
+<div class="hero-container">
+    <button class="primary-btn hero-cta-left" @onclick="GoToPrompt">
+        Go to Daily Prompt
+    </button>
+
+    <img src="sample-data/hero.png" alt="Welcome" class="hero-image-full" />
+</div>
+
+<h2 class="section-title">🔥 Most Popular Entries This Week</h2>
+
+@if (topEntries == null || !topEntries.Any())
+{
+    <p>No public entries yet.</p>
+}
+else
+{
+    <div class="horizontal-scroll">
+        @foreach (var entry in topEntries)
+        {
+            <div class="entry-card">
+                <h3>@entry.Title</h3>
+
+                <p>@(entry.Content.Length > 70 
+                    ? entry.Content.Substring(0, 70) + "..." 
+                    : entry.Content)</p>
+
+                <p>❤️ @entry.Likes likes</p>
+
+                <button class="secondary-btn" @onclick="() => ViewEntry(entry.Id)">
+                    View
+                </button>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    List<Entry> topEntries = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var publicEntries = await Http.GetFromJsonAsync<List<Entry>>("/entries/public");
+
+        topEntries = publicEntries
+            .OrderByDescending(e => e.Likes)
+            .Take(5)
+            .ToList();
+    }
+
+    void GoToPrompt()
+    {
+        Navigation.NavigateTo("/newentry");
+    }
+
+    void ViewEntry(int id)
+    {
+        Navigation.NavigateTo($"/view/{id}");
+    }
+}
