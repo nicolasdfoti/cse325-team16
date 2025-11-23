@@ -1,0 +1,86 @@
+@page "/login"
+@inject NavigationManager Nav
+@inject DailyNotes.Services.UserService UserService
+
+<h2 class="page-title">Login</h2>
+
+<div class="form-box">
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="error-box">@errorMessage</div>
+    }
+
+    <label>Email</label>
+    <input class="text-input" @bind="email" type="email" placeholder="example123@gmail.com" />
+
+    <label>Password</label>
+    <input class="text-input" @bind="password" type="password" placeholder="Your password" />
+
+    <button type="button" class="primary-btn" @onclick="LoginUser">
+        Login
+    </button>
+
+    <p class="mt-3">
+        Don't have an account?
+        <a href="/register"> Register here</a>
+    </p>
+</div>
+
+@code {
+    string email = "";
+    string password = "";
+    string errorMessage = "";
+
+    async Task LoginUser()
+    {
+        errorMessage = "";
+
+        // ---- Basic validation ----
+        if (string.IsNullOrWhiteSpace(email) || !email.Contains("@") || !email.Contains("."))
+        {
+            errorMessage = "Please enter a valid email (example123@gmail.com).";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            errorMessage = "Password is required.";
+            return;
+        }
+
+        try
+        {
+            Console.WriteLine($"[DEBUG] Trying to login with email: {email}");
+
+            // ---- Search user in DB ----
+            var user = await UserService.GetByEmailAsync(email);
+
+            if (user == null)
+            {
+                errorMessage = "Email not registered.";
+                Console.WriteLine("[DEBUG] User not found");
+                return;
+            }
+
+            // ---- Verify password ----
+            bool passwordMatches = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+            if (!passwordMatches)
+            {
+                errorMessage = "Incorrect password.";
+                Console.WriteLine("[DEBUG] Wrong password");
+                return;
+            }
+
+            Console.WriteLine("[DEBUG] Login successful!");
+
+            // ---- Redirect ----
+            Nav.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error logging in, check console.";
+            Console.WriteLine("[DEBUG] Login error: " + ex);
+        }
+    }
+}

@@ -1,0 +1,40 @@
+@page "/entries"
+@using DailyNotes.Models
+@inject DailyNotes.Services.EntryService entryService
+@inject NavigationManager nav
+@inject DailyNotes.Services.UserService UserService
+
+<h2 class="page-title">My Entries</h2>
+
+<div class="entry-list">
+    @foreach (var entry in myEntries)
+    {
+        <div class="entry-card">
+            <h4>@entry.Title</h4>
+            <p>@(entry.Content.Length > 100 ? entry.Content.Substring(0, 100) + "..." : entry.Content)</p>
+            <small>@entry.CreatedAt.ToShortDateString()</small>
+
+            <div class="card-actions">
+                <button class="secondary-btn" @onclick="() => EditEntry(entry.Id)">✏️ Edit</button>
+                <button class="danger-btn" @onclick="() => DeleteEntry(entry.Id)">🗑 Delete</button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    List<Entry> myEntries = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        myEntries = await entryService.GetMyEntriesAsync();
+    }
+
+    void EditEntry(int id) => nav.NavigateTo($"/editentry/{id}");
+
+    async Task DeleteEntry(int id)
+    {
+        await entryService.DeleteEntryAsync(id);
+        myEntries = await entryService.GetMyEntriesAsync();
+    }
+}

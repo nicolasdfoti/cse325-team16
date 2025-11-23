@@ -1,0 +1,6 @@
+@DailyNotes.API_HostAddress = http://localhost:5291
+
+GET {{DailyNotes.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

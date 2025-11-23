@@ -1,0 +1,50 @@
+@page "/editentry/{id:int}"
+@using DailyNotes.Models
+@inject DailyNotes.Services.EntryService entryService
+@inject NavigationManager nav
+@inject DailyNotes.Services.UserService UserService
+
+<h2 class="page-title">Edit Entry</h2>
+
+@if (entry == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="form-box">
+        <label>Title</label>
+        <input class="text-input" @bind="entry.Title" />
+
+        <label>Content</label>
+        <textarea class="text-area" rows="8" @bind="entry.Content"></textarea>
+
+        <label class="switch-label">
+            <input type="checkbox" @bind="entry.IsPublic" />
+            <span>Public</span>
+        </label>
+
+        <button class="primary-btn" @onclick="UpdateEntry">Update Entry</button>
+    </div>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    Entry? entry;
+
+    protected override async Task OnInitializedAsync()
+    {
+        entry = await entryService.GetEntryByIdAsync(id);
+    }
+
+  async Task UpdateEntry()
+{
+    if (entry is null)
+        return;
+
+    await entryService.UpdateEntryAsync(entry);
+    nav.NavigateTo("/entries");
+}
+
+}
