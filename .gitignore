@@ -35,7 +35,7 @@ secrets.json
 # Logs
 *.log
 
-# Node (si usas Blazor WebAssembly con npm)
+# Node
 node_modules/
 dist/
 
