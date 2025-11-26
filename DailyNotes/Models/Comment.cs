@@ -2,8 +2,8 @@ namespace DailyNotes.Models
 {
     public class Comment
     {
-        public string Author { get; set; } = "";
-        public string Text { get; set; } = "";
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public string Author { get; set; } = string.Empty;
+        public string Text { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
     }
 }

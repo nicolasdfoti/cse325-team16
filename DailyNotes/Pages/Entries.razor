@@ -1,12 +1,17 @@
 @page "/entries"
 @using DailyNotes.Models
 @inject DailyNotes.Services.EntryService entryService
+@inject DailyNotes.Services.AuthStateService AuthStateService
 @inject NavigationManager nav
-@inject DailyNotes.Services.UserService UserService
+@attribute [Authorize]
 
 <h2 class="page-title">My Entries</h2>
 
 <div class="entry-list">
+    @if (myEntries.Count == 0)
+    {
+        <p>You haven't written anything yet.</p>
+    }
     @foreach (var entry in myEntries)
     {
         <div class="entry-card">
@@ -27,12 +32,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await AuthStateService.EnsureInitializedAsync();
         myEntries = await entryService.GetMyEntriesAsync();
     }
 
-    void EditEntry(int id) => nav.NavigateTo($"/editentry/{id}");
+    void EditEntry(string id) => nav.NavigateTo($"/editentry/{id}");
 
-    async Task DeleteEntry(int id)
+    async Task DeleteEntry(string id)
     {
         await entryService.DeleteEntryAsync(id);
         myEntries = await entryService.GetMyEntriesAsync();

@@ -1,12 +1,16 @@
 @page "/prompt"
+@attribute [Authorize]
 
-<h2 class="page-title">Daily Prompt</h2>
-<p class="prompt-box">
-    @dailyPrompt
-</p>
+<h2>Daily Prompt</h2>
+<p>What emotion dominated your day and why?</p>
 
-<a class="primary-btn" href="/newentry">Write My Entry</a>
+<button class="primary-btn" @onclick="GoToNewEntry">Write My Entry</button>
 
 @code {
-    public string dailyPrompt = "What emotion dominated your day and why?";
+    [Inject] NavigationManager Navigation { get; set; }
+
+    void GoToNewEntry()
+    {
+        Navigation.NavigateTo("/newentry");
+    }
 }

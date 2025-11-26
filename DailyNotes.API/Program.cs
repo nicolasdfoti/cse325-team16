@@ -1,115 +1,66 @@
-using DailyNotes.API.Models;
 using DailyNotes.API.Services;
+using DailyNotes.API.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var config = builder.Configuration;
+
 // CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowBlazorDev", policy =>
-        policy.WithOrigins("http://localhost:5146")
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+    options.AddPolicy("AllowBlazor",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
 });
 
-// MongoDB Settings
-var mongoConnectionString = builder.Configuration.GetConnectionString("MongoDb");
-var mongoDatabaseName = builder.Configuration["DatabaseName"];
-
+// Mongo
 builder.Services.AddSingleton<IMongoClient>(sp =>
-    new MongoClient(mongoConnectionString));
+{
+    var conn = config.GetConnectionString("MongoDb")
+        ?? throw new Exception("Missing MongoDB connection string");
 
-builder.Services.AddSingleton<IMongoDatabase>(sp =>
+    return new MongoClient(conn);
+});
+
+builder.Services.AddSingleton(sp =>
 {
     var client = sp.GetRequiredService<IMongoClient>();
-    return client.GetDatabase(mongoDatabaseName);
+    return client.GetDatabase(config["DatabaseName"]);
 });
 
 // Services
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<EntryService>();
+builder.Services.AddSingleton<EntryDbService>();
+builder.Services.AddSingleton<UserDbService>();
+
+builder.Services.AddControllers();
+
+// JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var key = config["Jwt:Key"] ?? throw new Exception("Missing JWT Key");
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(key))
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
-app.UseCors("AllowBlazorDev");
 
-// Test endpoint
-app.MapGet("/", () => "DailyNotes API running!");
+app.UseCors("AllowBlazor");
+app.UseAuthentication();
+app.UseAuthorization();
 
-// Users endpoints
-app.MapGet("/users", async (UserService service) =>
-{
-    return await service.GetAsync();
-});
-
-// Get all entries (my entries)
-app.MapGet("/entries", async (EntryService service) =>
-{
-    var entries = await service.GetMyEntriesAsync();
-    return Results.Ok(entries);
-});
-
-// Get public entries
-app.MapGet("/entries/public", async (EntryService service) =>
-{
-    var entries = await service.GetPublicEntriesAsync();
-    return Results.Ok(entries);
-});
-
-// Get entry by id
-app.MapGet("/entries/{id}", async (EntryService service, string id) =>
-{
-    var entry = await service.GetEntryByIdAsync(id);
-    return entry is not null ? Results.Ok(entry) : Results.NotFound();
-});
-
-// Create entry
-app.MapPost("/entries", async (EntryService service, Entry entry) =>
-{
-    await service.CreateAsync(entry);
-    return Results.Created($"/entries/{entry.Id}", entry);
-});
-
-// Update entry
-app.MapPut("/entries/{id}", async (EntryService service, string id, Entry updated) =>
-{
-    updated.Id = MongoDB.Bson.ObjectId.Parse(id);
-    await service.UpdateEntryAsync(updated);
-    return Results.Ok(updated);
-});
-
-// Delete entry
-app.MapDelete("/entries/{id}", async (EntryService service, string id) =>
-{
-    await service.DeleteEntryAsync(id);
-    return Results.Ok();
-});
-
-// Like entry
-app.MapPost("/entries/{id}/like", async (EntryService service, string id) =>
-{
-    await service.LikeEntryAsync(id);
-    return Results.Ok();
-});
-
-// Dislike entry
-app.MapPost("/entries/{id}/dislike", async (EntryService service, string id) =>
-{
-    await service.DislikeEntryAsync(id);
-    return Results.Ok();
-});
-
-// Add comment
-app.MapPost("/entries/{id}/comments", async (EntryService service, string id, Comment comment) =>
-{
-    await service.AddCommentAsync(id, comment.Author, comment.Text);
-    return Results.Ok();
-});
-
-app.MapPost("/users", async (UserService service, User user) =>
-{
-    await service.CreateAsync(user);
-    return Results.Created($"/users/{user.Id}", user);
-});
+app.MapControllers();
 
 app.Run();

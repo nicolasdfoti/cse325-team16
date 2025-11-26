@@ -1,5 +1,5 @@
 /* ===============================================
-   PALETA EMOCIONAL SUAVE (Ideal para Journaling)
+   PALLETTE
 ================================================ */
 :root {
     --blue-soft: #A8D0E6;
@@ -18,7 +18,7 @@
 }
 
 /* ===============================================
-   ESTILO GLOBAL
+   GLOBAL
 ================================================ */
 body {
     margin: 0;
@@ -108,7 +108,7 @@ a {
 }
 
 /* ===============================================
-   TITULOS Y SUBTITULOS
+   TITLES AND SUBTITLES
 ================================================ */
 .page-title {
     font-size: 32px;
@@ -123,7 +123,7 @@ a {
 }
 
 /* ===============================================
-   BOTONES
+   BUTTONS
 ================================================ */
 .primary-btn {
     background: var(--blue-soft);
@@ -160,7 +160,7 @@ a {
 }
 
 /* ===============================================
-   TARJETAS DE ENTRADAS
+   ENTRY CARDS
 ================================================ */
 .entry-card {
     background: white;
@@ -186,7 +186,7 @@ a {
 }
 
 /* ===============================================
-   ÁREAS DE TEXTO Y FORMULARIOS
+   TEXT AND FORMS
 ================================================ */
 .form-box {
     background: white;
@@ -229,7 +229,7 @@ a {
 }
 
 /* ===============================================
-   DARK MODE AUTOMÁTICO
+   DARK MODE
 ================================================ */
 @media (prefers-color-scheme: dark) {
     body {
@@ -281,17 +281,14 @@ a {
 }
 
 /* ===============================================
-   HERO SECTION ORIGINAL
+   HERO SECTION
 ================================================ */
-/* Contenedor del hero */
-/* Contenedor del hero */
 .hero-container {
     position: relative;
     width: 100%;
     margin-bottom: 35px;
 }
 
-/* Imagen de fondo */
 .hero-image-full {
     width: 100%;
     height: auto;
@@ -301,14 +298,12 @@ a {
     object-fit: cover;
 }
 
-/* Botón encima de la imagen */
 .hero-cta-left {
     position: absolute;
     top: 20px;
     left: 20px;
     z-index: 10;
 
-    /* Estilos recomendados */
     padding: 12px 20px;
     background: white;
     color: rgb(50, 57, 195);
@@ -318,7 +313,6 @@ a {
 }
 
 
-/* Cards horizontales */
 .horizontal-cards {
     display: flex;
     gap: 20px;
@@ -336,7 +330,6 @@ a {
     border-radius: 10px;
 }
 
-/* Cada card ocupa espacio horizontal */
 .horizontal-cards .entry-card {
     min-width: 320px;
     scroll-snap-align: start;

@@ -1,6 +1,7 @@
 @page "/login"
 @inject NavigationManager Nav
-@inject DailyNotes.Services.UserService UserService
+@inject DailyNotes.Services.AuthService AuthService
+@inject IJSRuntime JS
 
 <h2 class="page-title">Login</h2>
 
@@ -53,29 +54,22 @@
         {
             Console.WriteLine($"[DEBUG] Trying to login with email: {email}");
 
-            // ---- Search user in DB ----
-            var user = await UserService.GetByEmailAsync(email);
+            // ---- Use AuthService to login ----
+            var result = await AuthService.LoginAsync(email, password);
 
-            if (user == null)
+            if (result != null)
             {
-                errorMessage = "Email not registered.";
-                Console.WriteLine("[DEBUG] User not found");
-                return;
+                Console.WriteLine("[DEBUG] Login successful!");
+                await JS.InvokeVoidAsync("localStorage.setItem", "userEmail", email);
+                
+                // ---- Redirect ----
+                Nav.NavigateTo("/");
             }
-
-            // ---- Verify password ----
-            bool passwordMatches = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
-            if (!passwordMatches)
+            else
             {
-                errorMessage = "Incorrect password.";
-                Console.WriteLine("[DEBUG] Wrong password");
-                return;
+                errorMessage = "Invalid email or password.";
+                Console.WriteLine("[DEBUG] Login failed: AuthService returned null");
             }
-
-            Console.WriteLine("[DEBUG] Login successful!");
-
-            // ---- Redirect ----
-            Nav.NavigateTo("/");
         }
         catch (Exception ex)
         {

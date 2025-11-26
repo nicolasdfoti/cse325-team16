@@ -1,4 +1,7 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using DailyNotes.Services
+@inject AuthStateService AuthStateService
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">DailyNotes</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -7,7 +10,7 @@
     </div>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+<div class="nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="nav flex-column">
 
         <div class="nav-item px-3">
@@ -16,58 +19,88 @@
             </NavLink>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/prompt">
-                <span class="bi bi-lightbulb-fill"></span> Daily Prompt
-            </NavLink>
-        </div>
+        @if (isAuthenticated)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/prompt">
+                    <span class="bi bi-lightbulb-fill"></span> Daily Prompt
+                </NavLink>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/entries">
-                <span class="bi bi-journal-text"></span> My Entries
-            </NavLink>
-        </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/entries">
+                    <span class="bi bi-journal-text"></span> My Entries
+                </NavLink>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/newentry">
-                <span class="bi bi-pencil-square"></span> Create Entry
-            </NavLink>
-        </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/newentry">
+                    <span class="bi bi-pencil-square"></span> Create Entry
+                </NavLink>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/public">
-                <span class="bi bi-globe-americas"></span> Public Entries
-            </NavLink>
-        </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/public">
+                    <span class="bi bi-globe-americas"></span> Public Entries
+                </NavLink>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/login">
-                <span class="bi bi-person-circle"></span> Log In
-            </NavLink>
-        </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/logout">
+                    <span class="bi bi-box-arrow-right"></span> Log Out
+                </NavLink>
+            </div>
+        }
+        else
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/login">
+                    <span class="bi bi-person-circle"></span> Log In
+                </NavLink>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/register">
-                <span class="bi bi-person-circle"></span> Register
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/logout">
-                <span class="bi bi-box-arrow-right"></span> Log Out
-            </NavLink>
-        </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/register">
+                    <span class="bi bi-person-circle"></span> Register
+                </NavLink>
+            </div>
+        }
 
     </nav>
 </div>
 
 @code {
     private bool collapseNavMenu = true;
+    private bool isAuthenticated = false;
+    private string userName = string.Empty;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthStateService.EnsureInitializedAsync();
+        
+        AuthStateService.OnChange += AuthStateChanged;
+        await UpdateAuthState();
+    }
+
+    private async Task UpdateAuthState()
+    {
+        isAuthenticated = AuthStateService.IsAuthenticated;
+        userName = AuthStateService.CurrentUser?.UserName ?? string.Empty;
+        StateHasChanged();
+    }
+
+    private async void AuthStateChanged()
+    {
+        await UpdateAuthState();
+    }
 
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    public void Dispose()
+    {
+        AuthStateService.OnChange -= AuthStateChanged;
     }
 }

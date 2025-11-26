@@ -1,8 +1,9 @@
-@page "/editentry/{id:int}"
+@page "/editentry/{id}"
 @using DailyNotes.Models
 @inject DailyNotes.Services.EntryService entryService
+@inject DailyNotes.Services.AuthStateService AuthStateService
 @inject NavigationManager nav
-@inject DailyNotes.Services.UserService UserService
+@attribute [Authorize]
 
 <h2 class="page-title">Edit Entry</h2>
 
@@ -29,22 +30,22 @@ else
 }
 
 @code {
-    [Parameter] public int id { get; set; }
+    [Parameter] public string id { get; set; } = string.Empty;
 
     Entry? entry;
 
     protected override async Task OnInitializedAsync()
     {
+        await AuthStateService.EnsureInitializedAsync();
         entry = await entryService.GetEntryByIdAsync(id);
     }
 
-  async Task UpdateEntry()
-{
-    if (entry is null)
-        return;
+    async Task UpdateEntry()
+    {
+        if (entry is null)
+            return;
 
-    await entryService.UpdateEntryAsync(entry);
-    nav.NavigateTo("/entries");
-}
-
+        await entryService.UpdateEntryAsync(entry);
+        nav.NavigateTo("/entries");
+    }
 }

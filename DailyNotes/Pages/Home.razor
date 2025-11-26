@@ -1,10 +1,20 @@
 ﻿@page "/"
 @using DailyNotes.Models
-@inject HttpClient Http
+@inject DailyNotes.Services.EntryService EntryService
+@inject DailyNotes.Services.AuthStateService AuthStateService
 @inject NavigationManager Navigation
-@inject DailyNotes.Services.UserService UserService
+@inject IJSRuntime JS
 
-<h1 class="homepage-title">Welcome to Daily Notes</h1>
+<h1 class="homepage-title">
+    @if (AuthStateService.IsAuthenticated)
+    {
+        <text>Good to see you again, @AuthStateService.CurrentUser.UserName ✨</text>
+    }
+    else
+    {
+        <text>Welcome to Daily Notes</text>
+    }
+</h1>
 <p class="homepage-subtitle">A safe space to write, heal, and grow one day at a time ✨</p>
 
 <div class="hero-container">
@@ -45,15 +55,39 @@ else
 
 @code {
     List<Entry> topEntries = new();
+    string localName;
 
     protected override async Task OnInitializedAsync()
     {
-        var publicEntries = await Http.GetFromJsonAsync<List<Entry>>("/entries/public");
 
-        topEntries = publicEntries
-            .OrderByDescending(e => e.Likes)
-            .Take(5)
-            .ToList();
+        AuthStateService.OnChange += AuthStateChanged;
+
+        await AuthStateService.EnsureInitializedAsync();
+        StateHasChanged();
+       
+        try
+        {
+            localName = await JS.InvokeAsync<string>("localStorage.getItem", "userName");
+            var publicEntries = await EntryService.GetPublicEntriesAsync();
+            topEntries = publicEntries?
+                .OrderByDescending(e => e.Likes)
+                .Take(5)
+                .ToList() ?? new List<Entry>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading entries: {ex.Message}");
+        }
+    }
+
+    private void AuthStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AuthStateService.OnChange -= AuthStateChanged;
     }
 
     void GoToPrompt()
@@ -61,7 +95,7 @@ else
         Navigation.NavigateTo("/newentry");
     }
 
-    void ViewEntry(int id)
+    void ViewEntry(string id)
     {
         Navigation.NavigateTo($"/view/{id}");
     }

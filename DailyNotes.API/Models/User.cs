@@ -8,9 +8,11 @@ namespace DailyNotes.API.Models
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = null!;
-        public string UserName { get; set; }
-        public string Email { get; set; }
+        public string UserName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
         public int Age { get; set; }    
-        public string PasswordHash { get; set; }
+        public string PasswordHash { get; set; } = string.Empty;
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
