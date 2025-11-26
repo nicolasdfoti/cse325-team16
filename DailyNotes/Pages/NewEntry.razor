@@ -1,8 +1,9 @@
 @page "/newentry"
 @using DailyNotes.Models
 @inject DailyNotes.Services.EntryService EntryService
+@inject DailyNotes.Services.AuthStateService AuthStateService
 @inject NavigationManager nav
-@inject DailyNotes.Services.UserService UserService
+@attribute [Authorize]
 
 <h3>Create New Entry</h3>
 
@@ -27,6 +28,11 @@
     string title = "";
     string content = "";
     bool isPublic = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthStateService.EnsureInitializedAsync();
+    }
 
     async Task Save()
     {

@@ -1,4 +1,18 @@
 @page "/logout"
+@inject DailyNotes.Services.AuthStateService AuthStateService
+@inject NavigationManager nav
+@inject IJSRuntime JS
 
 <h2 class="page-title">Logging Out...</h2>
 <p>Thank you for writing today. Come back anytime ✦</p>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await JS.InvokeVoidAsync("localStorage.removeItem", "userName");
+        await JS.InvokeVoidAsync("localStorage.removeItem", "userEmail");
+        await AuthStateService.LogoutAsync();
+
+        nav.NavigateTo("/", true);
+    }
+}

@@ -1,7 +1,8 @@
 @page "/register"
 @using DailyNotes.Models
-@inject DailyNotes.Services.UserService UserService
+@inject DailyNotes.Services.AuthService AuthService
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 
 <h2 class="page-title">Create Account</h2>
 
@@ -78,29 +79,22 @@
 
         try
         {
-            Console.WriteLine("[DEBUG] Checking if email exists in DB...");
-            var existing = await UserService.GetByEmailAsync(email);
-            if (existing != null)
+            Console.WriteLine("[DEBUG] Sending register request to AuthService...");
+            var result = await AuthService.RegisterAsync(name, email, age, password);
+            
+            if (result != null)
             {
-                errorMessage = "This email is already registered.";
-                Console.WriteLine("[DEBUG] Email already registered");
-                return;
+                Console.WriteLine("[DEBUG] User registered successfully with JWT!");
+                await JS.InvokeVoidAsync("localStorage.setItem", "userName", name);
+                await JS.InvokeVoidAsync("localStorage.setItem", "userEmail", email);
+
+                @* Nav.NavigateTo("/login"); *@
             }
-
-            // ---- Create the user ----
-            var newUser = new User
+            else
             {
-                UserName = name,
-                Email = email,
-                PasswordHash = password
-            };
-
-            Console.WriteLine("[DEBUG] Sending CreateAsync request to backend...");
-            await UserService.CreateAsync(newUser);
-            Console.WriteLine("[DEBUG] User created successfully!");
-
-            // ---- Redirect ----
-            Nav.NavigateTo("/login");
+                errorMessage = "Registration failed. Email might already be registered.";
+                Console.WriteLine("[DEBUG] Registration failed: AuthService returned null");
+            }
         }
         catch (Exception ex)
         {

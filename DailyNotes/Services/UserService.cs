@@ -14,14 +14,21 @@ namespace DailyNotes.Services
 
         public async Task<User?> GetByEmailAsync(string email)
         {
-            var allUsers = await _http.GetFromJsonAsync<List<User>>("http://localhost:5147/users");
-            if (allUsers == null) return null;
-            return allUsers.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            try
+            {
+                var allUsers = await _http.GetFromJsonAsync<List<User>>("/users");
+                return allUsers?.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            }
+            catch
+            {
+                return null;
+            }
         }
+
         public async Task CreateAsync(User user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
-            await _http.PostAsJsonAsync("http://localhost:5147/users", user);
+            await _http.PostAsJsonAsync("/users", user);
         }
     }   
 }
