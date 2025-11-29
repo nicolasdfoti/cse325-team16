@@ -98,7 +98,6 @@ namespace DailyNotes.Services
 
         public async Task<List<Entry>> GetPublicEntriesAsync()
         {
-            RemoveToken();
             try
             {
                 return await _http.GetFromJsonAsync<List<Entry>>("/entries/public") ?? new();
@@ -108,41 +107,58 @@ namespace DailyNotes.Services
                 Console.WriteLine($"Error getting public entries: {ex.Message}");
                 return new List<Entry>();
             }
-        }
-
-        public async Task LikeEntryAsync(string id)
-        {
-            await AddTokenAsync();
-            try
-            {
-                await _http.PostAsync($"/entries/{id}/like", null);
-            }
             finally
             {
                 RemoveToken();
             }
         }
 
-        public async Task DislikeEntryAsync(string id)
+        public async Task<Entry?> AddCommentAsync(string entryId, string text)
         {
-            await AddTokenAsync();
             try
-            {
-                await _http.PostAsync($"/entries/{id}/dislike", null);
+        {
+                var token = await _auth.GetTokenAsync();
+                if (!string.IsNullOrEmpty(token))
+                {
+                    _http.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                }
+
+                var payload = new { Text = text };
+
+                var response = await _http.PostAsJsonAsync($"/entries/{entryId}/comment", payload);
+
+                _http.DefaultRequestHeaders.Authorization = null;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<Entry>();
+                }
+
+                var err = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"AddCommentAsync failed: {response.StatusCode} - {err}");
+                return null;
             }
-            finally
+            catch (Exception ex)
             {
-                RemoveToken();
+                Console.WriteLine($"AddCommentAsync exception: {ex}");
+
+                _http.DefaultRequestHeaders.Authorization = null;
+                return null;
             }
         }
 
-        public async Task AddCommentAsync(string entryId, string author, string text)
+        public async Task<Entry?> LikeEntryAsync(string id)
         {
             await AddTokenAsync();
             try
             {
-                var comment = new { Author = author, Text = text };
-                await _http.PostAsJsonAsync($"/entries/{entryId}/comments", comment);
+                var response = await _http.PostAsync($"/entries/{id}/like", null);
+                
+                if (!response.IsSuccessStatusCode)
+                    return null;
+
+                return await response.Content.ReadFromJsonAsync<Entry>();
             }
             finally
             {

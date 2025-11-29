@@ -1,6 +1,8 @@
 @page "/register"
 @using DailyNotes.Models
 @inject DailyNotes.Services.AuthService AuthService
+@inject DailyNotes.Services.AuthStateService AuthStateService
+
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 
@@ -84,11 +86,8 @@
             
             if (result != null)
             {
-                Console.WriteLine("[DEBUG] User registered successfully with JWT!");
-                await JS.InvokeVoidAsync("localStorage.setItem", "userName", name);
-                await JS.InvokeVoidAsync("localStorage.setItem", "userEmail", email);
-
-                @* Nav.NavigateTo("/login"); *@
+                await AuthStateService.LoginAsync(result); 
+                Nav.NavigateTo("/");
             }
             else
             {

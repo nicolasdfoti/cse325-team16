@@ -1,6 +1,8 @@
 @page "/login"
 @inject NavigationManager Nav
 @inject DailyNotes.Services.AuthService AuthService
+@inject DailyNotes.Services.AuthStateService AuthStateService
+
 @inject IJSRuntime JS
 
 <h2 class="page-title">Login</h2>
@@ -59,12 +61,11 @@
 
             if (result != null)
             {
-                Console.WriteLine("[DEBUG] Login successful!");
-                await JS.InvokeVoidAsync("localStorage.setItem", "userEmail", email);
-                
-                // ---- Redirect ----
+
+                await AuthStateService.LoginAsync(result); 
                 Nav.NavigateTo("/");
             }
+
             else
             {
                 errorMessage = "Invalid email or password.";

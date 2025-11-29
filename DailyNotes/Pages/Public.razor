@@ -24,7 +24,11 @@ else
 
                 <p>@Shorten(e.Content)</p>
 
-                <a class="primary-btn" href="/view/@e.Id">View</a>
+                <button @onclick="() => ToggleLike(e.Id)">
+                    👍 @e.Likes
+                </button>
+
+                <a class="primary-btn" href="/viewentry/@e.Id">View</a>
             </div>
         }
     </div>
@@ -32,6 +36,7 @@ else
 
 @code {
     List<Entry>? entries;
+    Entry? entry;
 
     protected override async Task OnInitializedAsync()
     {
@@ -43,5 +48,26 @@ else
             return "";
 
         return text.Length <= 150 ? text : text.Substring(0, 150) + "...";
+    }
+
+    async Task LoadEntries()
+    {
+        entries = await entryService.GetPublicEntriesAsync();
+    }
+
+    async Task ToggleLike(string entryId)
+    {
+        var updated = await entryService.LikeEntryAsync(entryId);
+
+        if (updated != null)
+        {
+            var index = entries.FindIndex(e => e.Id == entryId);
+            if (index != -1)
+            {
+                entries[index] = updated;
+            }
+
+            StateHasChanged();
+        }
     }
 }

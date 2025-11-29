@@ -1,0 +1,123 @@
+@page "/viewentry/{Id}"
+@using DailyNotes.Models
+@using DailyNotes.Services
+@inject EntryService entryService
+@inject DailyNotes.Services.AuthStateService AuthStateService
+@inject NavigationManager NavigationManager
+
+<h2 class="page-title">View Entry</h2>
+
+@if (entry is null)
+{
+    <p>Loading entry...</p>
+}
+else
+{
+    <div class="entry-container">
+        <h2 class="entry-title">@entry.Title</h2>
+        <p class="entry-date">@entry.CreatedAt.ToString("MMMM dd, yyyy")</p>
+
+        <div class="entry-content">
+            @entry.Content
+        </div>
+
+        <hr />
+
+        <button @onclick="ToggleLike" class="like-button">
+            ❤️ Like (@entry.Likes)
+        </button>
+
+        <hr />
+
+        <h3>Comments</h3>
+
+        @if (entry.Comments != null && entry.Comments.Count > 0)
+        {
+            foreach (var c in entry.Comments.OrderByDescending(c => c.CreatedAt))
+            {
+                <div class="comment-box">
+                    <strong>@c.Author</strong>
+                    <p>@c.Text</p>
+                    <small>@c.CreatedAt.ToLocalTime()</small>
+                </div>
+            }
+        }
+        else
+        {
+            <p>No comments yet</p>
+        }
+
+        <textarea class="form-control" 
+                  @bind="newCommentText" 
+                  placeholder="Leave a comment...">
+        </textarea>
+
+        <button class="btn btn-success mt-2" @onclick="AddComment">
+            Comment
+        </button>
+
+        <hr />
+
+        <button class="primary-btn" @onclick="GoBack">Back</button>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    Entry? entry;
+    private string newCommentText = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(Id))
+        {
+            entry = await entryService.GetEntryByIdAsync(Id);
+        }
+    }
+
+    void GoBack()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    async Task ToggleLike()
+    {
+        var updated = await entryService.LikeEntryAsync(entry.Id);
+
+        if (updated != null)
+        {
+            entry.Likes = updated.Likes;
+            StateHasChanged();
+        }
+    }
+
+    private async Task AddComment()
+    {
+        if (string.IsNullOrWhiteSpace(newCommentText))
+            return;
+
+        await AuthStateService.EnsureInitializedAsync();
+
+        if (!AuthStateService.IsAuthenticated)
+        {
+            Console.WriteLine("AddComment aborted: user not authenticated");
+            return;
+        }
+
+        var updated = await entryService.AddCommentAsync(entry.Id, newCommentText);
+
+        if (updated != null)
+        {
+            entry = updated;
+            newCommentText = "";
+        }
+        else
+        {
+            Console.WriteLine("AddComment returned null (check network/backend logs)");
+        }
+
+        StateHasChanged();
+    }
+}

@@ -51,7 +51,15 @@ namespace DailyNotes.API.Controllers
             if (token == null)
                 return Unauthorized("Invalid credentials");
 
-            return Ok(new { Token = token });
+            var user = await _userService.GetByEmailAsync(dto.Email);
+
+            return Ok(new AuthResponse
+            {
+                Token = token,
+                UserId = user.Id,
+                UserName = user.UserName,
+                Email = user.Email
+            });
         }
 
         [HttpGet("me")]
