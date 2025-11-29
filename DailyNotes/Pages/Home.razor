@@ -1,6 +1,6 @@
 ﻿@page "/"
 @using DailyNotes.Models
-@inject DailyNotes.Services.EntryService EntryService
+@inject DailyNotes.Services.EntryService entryService
 @inject DailyNotes.Services.AuthStateService AuthStateService
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
@@ -29,26 +29,43 @@
 
 @if (topEntries == null || !topEntries.Any())
 {
-    <p>No public entries yet.</p>
+    @if (!AuthStateService.IsAuthenticated)
+    {
+        <p>Please log in to see popular entries.</p>
+    }
+    else
+    {
+        <p>No public entries yet.</p>
+    }
 }
 else
 {
     <div class="horizontal-scroll">
-        @foreach (var entry in topEntries)
+
+        @if (!AuthStateService.IsAuthenticated)
         {
-            <div class="entry-card">
-                <h3>@entry.Title</h3>
+            <p class="info-text">Log in to see more details!</p>
+        }
+        else{
+            @foreach (var entry in topEntries)
+            {
+                <div class="entry-card">
+                    <h3>@entry.Title</h3>
 
-                <p>@(entry.Content.Length > 70 
-                    ? entry.Content.Substring(0, 70) + "..." 
-                    : entry.Content)</p>
+                    <p>@(entry.Content.Length > 70 
+                        ? entry.Content.Substring(0, 70) + "..." 
+                        : entry.Content)</p>
 
-                <p>❤️ @entry.Likes likes</p>
+                    <p>❤️ @entry.Likes likes</p>
+                    <button @onclick="() => ToggleLike(entry.Id)">
+                        👍 @entry.Likes
+                    </button>
 
-                <button class="secondary-btn" @onclick="() => ViewEntry(entry.Id)">
-                    View
-                </button>
-            </div>
+                    <button class="secondary-btn" @onclick="() => ViewEntry(entry.Id)">
+                        View
+                    </button>
+                </div>
+            }
         }
     </div>
 }
@@ -56,6 +73,7 @@ else
 @code {
     List<Entry> topEntries = new();
     string localName;
+    Entry? entry;
 
     protected override async Task OnInitializedAsync()
     {
@@ -68,7 +86,7 @@ else
         try
         {
             localName = await JS.InvokeAsync<string>("localStorage.getItem", "userName");
-            var publicEntries = await EntryService.GetPublicEntriesAsync();
+            var publicEntries = await entryService.GetPublicEntriesAsync();
             topEntries = publicEntries?
                 .OrderByDescending(e => e.Likes)
                 .Take(5)
@@ -97,6 +115,23 @@ else
 
     void ViewEntry(string id)
     {
-        Navigation.NavigateTo($"/view/{id}");
+        Navigation.NavigateTo($"/viewentry/{id}");
     }
+
+    async Task ToggleLike(string entryId)
+{
+    var updated = await entryService.LikeEntryAsync(entryId);
+
+    if (updated != null)
+    {
+        var index = topEntries.FindIndex(e => e.Id == entryId);
+        if (index != -1)
+        {
+            topEntries[index] = updated;
+        }
+
+        StateHasChanged();
+    }
+}
+
 }

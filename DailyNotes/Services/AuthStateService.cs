@@ -85,6 +85,7 @@ namespace DailyNotes.Services
                     };
 
                     Console.WriteLine($"Loaded user from storage: {CurrentUser.UserName}");
+                    Console.WriteLine($"Loaded token: {Token}, user: {CurrentUser?.UserName}");
                 }
                 else
                 {
