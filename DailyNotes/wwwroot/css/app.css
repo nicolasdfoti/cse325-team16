@@ -1,11 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Quintessential&family=Vend+Sans:ital,wght@0,300..700;1,300..700&display=swap');
 /* ===============================================
    PALLETTE
 ================================================ */
 :root {
-    --blue-soft: #A8D0E6;
+    --font-primary: 'Vend Sans', sans-serif;
+    --font-accent: 'Quintessential', cursive;
+
+    --green-soft: #93A67E;
     --white-soft: #F7F9FC;
-    --gray-soft: #5E6472;
-    --beige-warm: #F2E9D8;
+    --beige-warm: #FEF2D6;
     --mint-soft: #C8E6C9;
     --soft-shadow: rgba(0,0,0,0.12);
 
@@ -24,16 +27,22 @@ body {
     margin: 0;
     background: var(--white-soft);
     color: #333;
-    font-family: 'Inter', sans-serif;
     line-height: 1.6;
 }
 
+main{
+ width:90%;
+ margin: 0 auto;
+}
+
 h1, h2, h3 {
+    font-family: var(--font-accent);
     margin-bottom: 10px;
 }
 
 a {
     text-decoration: none;
+    font-family: var(--font-primary);
 }
 
 /* ===============================================
@@ -48,35 +57,43 @@ a {
 /* ===============================================
    NAVBAR
 ================================================ */
-.navbar {
-    background: var(--blue-soft);
+.sidebar {
+    background: var(--green-soft);
     padding: 20px;
     text-align: center;
     box-shadow: var(--shadow);
+    display: flex;
+    justify-content: space-between;
+}
+
+.brand {
+   float: right;
 }
 
 .brand h2 {
     margin: 0;
+    font-family: var(--font-accent);
     font-size: 28px;
     font-weight: 800;
-    color: #222;
+    color: #222;;
 }
 
 .tagline {
     font-size: 14px;
-    color: var(--gray-soft);
+    color: black;
+    font-family: var(--font-primary);
 }
 
 .nav-links {
     margin-top: 14px;
     padding: 0;
     display: flex;
-    gap: 28px;
-    justify-content: center;
+    gap: 40px;
+    justify-content: left;
 }
 
 .nav-links a {
-    color: var(--gray-soft);
+    color: black;
     font-weight: 600;
     transition: .25s;
 }
@@ -86,25 +103,65 @@ a {
     border-bottom: 2px solid #111;
 }
 
+.hamburger {
+  display: none;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Mobile view */
+@media (max-width: 700px) {
+  .hamburger {
+    display: block;
+    margin-left: 10px;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+    background: var(--green-soft);
+    padding: 20px;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    margin-top: 10px;
+  }
+
+  .nav-links.show {
+    display: flex;
+  }
+
+  .sidebar {
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+  }
+}
+
 /* ===============================================
    MAIN CONTENT
 ================================================ */
 .main-content {
     flex: 1;
     max-width: 900px;
-    margin: auto;
+    margin: 0 auto;
     padding: 30px;
 }
 
 /* ===============================================
    FOOTER
 ================================================ */
-.footer {
-    background: var(--beige-warm);
+footer {
+    background: var(--green-soft);
     padding: 16px;
     text-align: center;
-    color: var(--gray-soft);
+    color: black;
     box-shadow: var(--shadow);
+    margin-top: 20px;
 }
 
 /* ===============================================
@@ -117,16 +174,32 @@ a {
 }
 
 .page-subtitle {
-    color: var(--gray-soft);
+    color: black;
     margin-bottom: 20px;
     font-size: 17px;
+}
+
+.homepage-title {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    font-family: var(--font-accent);
+    text-align: center;
+}
+
+.homepage-subtitle {
+    color: black;
+    margin-bottom: 30px;
+    font-size: 20px;
+    font-family: var(--font-primary);
+    text-align: center;
 }
 
 /* ===============================================
    BUTTONS
 ================================================ */
 .primary-btn {
-    background: var(--blue-soft);
+    background: var(--green-soft);
     padding: 12px 28px;
     color: #222;
     border-radius: var(--radius);
@@ -286,16 +359,18 @@ a {
 .hero-container {
     position: relative;
     width: 100%;
-    margin-bottom: 35px;
 }
 
 .hero-image-full {
     width: 100%;
-    height: auto;
+    height: 90vh;
     display: block;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     object-fit: cover;
+    margin: 0 auto;
+    object-position: top;
+;
 }
 
 .hero-cta-left {
@@ -326,11 +401,23 @@ a {
 }
 
 .horizontal-cards::-webkit-scrollbar-thumb {
-    background: var(--gray-soft);
+    background: black;
     border-radius: 10px;
 }
 
 .horizontal-cards .entry-card {
     min-width: 320px;
     scroll-snap-align: start;
+}
+
+/* ===============================================
+   Top Entries Section
+================================================ */
+
+.top-entries-section {
+    background-color: var(--beige-warm);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 10px;
+    margin-top: 20px;
 }

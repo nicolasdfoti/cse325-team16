@@ -7,7 +7,7 @@ namespace DailyNotes.Services
     {
         private readonly HttpClient _http;
         private readonly AuthStateService _authStateService;
-        
+
         public AuthService(HttpClient http, AuthStateService authStateService)
         {
             _http = http;
@@ -16,27 +16,24 @@ namespace DailyNotes.Services
 
         public async Task<AuthResponse?> LoginAsync(string email, string password)
         {
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                throw new ArgumentException("Email and password are required.");
+
             try
             {
-                var response = await _http.PostAsJsonAsync("/api/users/login", new
-                {
-                    Email = email,
-                    Password = password
-                });
+                var response = await _http.PostAsJsonAsync("/api/users/login", new LoginRequest(email, password));
+                if (!response.IsSuccessStatusCode) return null;
 
-                if (response.IsSuccessStatusCode)
+                var result = await response.Content.ReadFromJsonAsync<AuthResponse>().ConfigureAwait(false);
+                if (result != null)
                 {
-                    var result = await response.Content.ReadFromJsonAsync<AuthResponse>();
-                    if (result != null)
-                    {
-                        await _authStateService.LoginAsync(result);
-                    }
-                    return result;
+                    await _authStateService.LoginAsync(result);
                 }
-                return null;
+                return result;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.Error.WriteLine($"Login failed: {ex.Message}");
                 return null;
             }
         }
@@ -45,29 +42,24 @@ namespace DailyNotes.Services
         {
             try
             {
-                var response = await _http.PostAsJsonAsync("/api/users/register", new
-                {
-                    UserName = userName,
-                    Email = email,
-                    Age = age,
-                    Password = password
-                });
+                var response = await _http.PostAsJsonAsync("/api/users/register", new RegisterRequest(userName, email, age, password));
+                if (!response.IsSuccessStatusCode) return null;
 
-                if (response.IsSuccessStatusCode)
+                var result = await response.Content.ReadFromJsonAsync<AuthResponse>().ConfigureAwait(false);
+                if (result != null)
                 {
-                    var result = await response.Content.ReadFromJsonAsync<AuthResponse>();
-                    if (result != null)
-                    {
-                        await _authStateService.LoginAsync(result);
-                    }
-                    return result;
+                    await _authStateService.LoginAsync(result);
                 }
-                return null;
+                return result;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.Error.WriteLine($"Registration failed: {ex.Message}");
                 return null;
             }
         }
     }
+
+    public record LoginRequest(string Email, string Password);
+    public record RegisterRequest(string UserName, string Email, int Age, string Password);
 }
