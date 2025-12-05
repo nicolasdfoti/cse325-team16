@@ -67,7 +67,7 @@ app.UseStaticFiles();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
 app.Urls.Add($"http://*:{port}");
 
 app.Run();
