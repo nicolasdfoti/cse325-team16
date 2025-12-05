@@ -14,6 +14,12 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
   </ItemGroup>
 
+  <!-- Reference the Blazor client project so its output is copied into wwwroot -->
+  <ItemGroup>
+    <ProjectReference Include="..\DailyNotes\DailyNotes.csproj" />
+  </ItemGroup>
+
+  <!-- Optional: exclude client appsettings.json if you only use env vars -->
   <ItemGroup>
     <None Update="..\DailyNotes\appsettings.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
