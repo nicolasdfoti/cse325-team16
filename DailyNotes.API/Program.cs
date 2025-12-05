@@ -49,7 +49,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = false,
             ValidateAudience = false,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(key))
+            IssuerSigningKey = new SymmetricSecurityKey(
+                System.Text.Encoding.UTF8.GetBytes(key))
         };
     });
 
@@ -61,13 +62,13 @@ app.UseCors("AllowBlazor");
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Serve Blazor WASM static files
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.MapControllers();
-app.MapFallbackToFile("index.html");
 
-BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
-app.Urls.Add($"http://*:{port}");
+// Blazor fallback
+app.MapFallbackToFile("index.html");
 
 app.Run();
