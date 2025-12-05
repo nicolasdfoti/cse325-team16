@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DailyNotes\DailyNotes.csproj" />
+    <None Update="..\DailyNotes\appsettings.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
 
 </Project>

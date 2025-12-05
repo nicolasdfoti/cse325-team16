@@ -1,4 +1,4 @@
-namespace DailyNotes.Models
+namespace DailyNotes.API.Models
 {
     public class AuthResponse
     {
