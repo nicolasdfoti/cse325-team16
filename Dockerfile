@@ -1,22 +1,37 @@
-# Build Stage
+# ===========================
+#   BUILD STAGE
+# ===========================
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-WORKDIR /app
+WORKDIR /src
 
-# Backend
-COPY DailyNotes.API/*.csproj ./DailyNotes.API/
+# Copy only solution + csproj files first
+COPY DailyNotes.sln ./
+COPY DailyNotes/DailyNotes.csproj ./DailyNotes/
+COPY DailyNotes.API/DailyNotes.API.csproj ./DailyNotes.API/
+
+# Restore dependencies
 RUN dotnet restore DailyNotes.API/DailyNotes.API.csproj
 
-# Copy backend code including wwwroot con Blazor
-COPY DailyNotes.API/. ./DailyNotes.API/
+# Copy full source
+COPY . .
 
-# Publish backend
-RUN dotnet publish DailyNotes.API/DailyNotes.API.csproj -c Release -o /app/publish
+# Publish API + Blazor client (because of ProjectReference)
+WORKDIR /src/DailyNotes.API
+RUN dotnet publish -c Release -o /app/publish
 
-# Runtime Stage
+
+# ===========================
+#   RUNTIME STAGE
+# ===========================
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
-COPY --from=build /app/publish .
 
-ENV ASPNETCORE_URLS=http://+:8080
-EXPOSE 8080
+# Copy published output (API + Blazor files)
+COPY --from=build /app/publish ./
+
+# Render requirement: bind to dynamic PORT
+ENV ASPNETCORE_URLS=http://0.0.0.0:${PORT}
+
+EXPOSE 10000
+
 ENTRYPOINT ["dotnet", "DailyNotes.API.dll"]
