@@ -62,6 +62,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseDefaultFiles();
+app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.MapControllers();
