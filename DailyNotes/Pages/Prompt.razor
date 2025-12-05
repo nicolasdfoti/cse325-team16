@@ -7,7 +7,7 @@
 <button class="primary-btn" @onclick="GoToNewEntry">Write My Entry</button>
 
 @code {
-    [Inject] NavigationManager Navigation { get; set; }
+    [Inject] NavigationManager Navigation { get; set; } = default;
 
     void GoToNewEntry()
     {
