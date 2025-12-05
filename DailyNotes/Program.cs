@@ -28,5 +28,4 @@ var host = builder.Build();
 var authState = host.Services.GetRequiredService<AuthStateService>();
 await authState.EnsureInitializedAsync();
 
-// ❗ Y recién ahora se corre
 await host.RunAsync();
