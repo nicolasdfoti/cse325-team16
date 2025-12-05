@@ -32,7 +32,7 @@ namespace DailyNotes.API.Services
         public async Task<List<Entry>> GetPublicEntriesAsync()
         {
             return await _entries
-                .Find(_ => true)
+                .Find(e => e.IsPublic == true)
                 .SortByDescending(e => e.CreatedAt)
                 .ToListAsync();
         }

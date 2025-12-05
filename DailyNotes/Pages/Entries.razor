@@ -32,7 +32,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await AuthStateService.EnsureInitializedAsync();
         myEntries = await entryService.GetMyEntriesAsync();
     }
 

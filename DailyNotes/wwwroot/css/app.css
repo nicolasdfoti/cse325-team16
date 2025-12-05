@@ -57,90 +57,133 @@ a {
 /* ===============================================
    NAVBAR
 ================================================ */
+
 .sidebar {
     background: var(--green-soft);
-    padding: 20px;
-    text-align: center;
+    padding: 16px 24px;
     box-shadow: var(--shadow);
     display: flex;
+    align-items: center;
     justify-content: space-between;
+    position: relative;
 }
 
+/* BRAND */
 .brand {
-   float: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
 .brand h2 {
     margin: 0;
     font-family: var(--font-accent);
     font-size: 28px;
-    font-weight: 800;
-    color: #222;;
+    color: #222;
 }
 
 .tagline {
-    font-size: 14px;
-    color: black;
+    font-size: 13px;
+    color: #222;
+    opacity: .85;
     font-family: var(--font-primary);
+    margin-top: 2px;
 }
 
 .nav-links {
-    margin-top: 14px;
-    padding: 0;
     display: flex;
-    gap: 40px;
-    justify-content: left;
+    align-items: center;
+    gap: 28px;
 }
 
 .nav-links a {
-    color: black;
+    font-family: var(--font-primary);
+    color: #222;
     font-weight: 600;
+    position: relative;
+    padding-bottom: 4px;
     transition: .25s;
 }
 
-.nav-links a:hover {
-    color: #111;
-    border-bottom: 2px solid #111;
+.nav-links a::after {
+    content: "";
+    height: 2px;
+    width: 0;
+    background: #222;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    transition: .25s;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
 }
 
 .hamburger {
-  display: none;
-  font-size: 24px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-/* Mobile view */
-@media (max-width: 700px) {
-  .hamburger {
-    display: block;
-    margin-left: 10px;
-  }
-
-  .nav-links {
     display: none;
-    flex-direction: column;
-    gap: 20px;
-    background: var(--green-soft);
-    padding: 20px;
-    position: absolute;
-    top: 60px;
-    left: 0;
-    right: 0;
-    margin-top: 10px;
-  }
-
-  .nav-links.show {
-    display: flex;
-  }
-
-  .sidebar {
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-  }
+    font-size: 28px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    line-height: 1;
 }
+
+/* ===============================================
+   MOBILE
+================================================ */
+@media (max-width: 768px) {
+
+    .sidebar {
+        padding: 14px 18px;
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        gap: 18px;
+        background: var(--green-soft);
+        padding: 20px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        position: absolute;
+        top: 100%;
+        left: 12px;
+        right: 12px;
+        margin-top: 10px;
+        z-index: 50;
+    }
+
+    .nav-links.show {
+        display: flex;
+    }
+
+    .nav-links a {
+        font-size: 18px;
+        text-align: center;
+    }
+
+    .brand {
+        align-items: flex-end;
+    }
+}
+
+/* ===============================================
+   DESKTOP FIX
+================================================ */
+
+/* Asegura que en desktop NUNCA se oculte */
+@media (min-width: 769px) {
+    .nav-links {
+        display: flex !important;
+    }
+}
+
 
 /* ===============================================
    MAIN CONTENT
@@ -267,6 +310,12 @@ footer {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     max-width: 700px;
+    margin-top: 20px;
+    justify-self: center;
+}
+
+.form-box h2 {
+    text-align: center;
 }
 
 .text-input,

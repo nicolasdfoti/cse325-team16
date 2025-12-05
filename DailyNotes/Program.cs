@@ -23,4 +23,10 @@ builder.Services.AddScoped<EntryService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 
-await builder.Build().RunAsync();
+var host = builder.Build();
+
+var authState = host.Services.GetRequiredService<AuthStateService>();
+await authState.EnsureInitializedAsync();
+
+// ❗ Y recién ahora se corre
+await host.RunAsync();

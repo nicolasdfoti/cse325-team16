@@ -132,7 +132,6 @@ namespace DailyNotes.Services
 
             return Token;
         }
-
         private void NotifyStateChanged() => OnChange?.Invoke();
     }
 }

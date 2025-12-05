@@ -7,7 +7,7 @@
         ☰
     </button>
 
-    <div class="nav-links @(collapseNavMenu ? "collapse" : "show")">
+    <div class="nav-links @(collapseNavMenu ? "" : "show")">
         <NavLink href="/" Match="NavLinkMatch.All">Home</NavLink>
 
         @if (isAuthenticated)

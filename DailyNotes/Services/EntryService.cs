@@ -34,9 +34,19 @@ namespace DailyNotes.Services
         public async Task<List<Entry>> GetMyEntriesAsync()
         {
             await AddTokenAsync();
+
             try
             {
-                return await _http.GetFromJsonAsync<List<Entry>>("/entries") ?? new();
+                var response = await _http.GetAsync("/entries");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"Error fetching entries: {response.StatusCode}");
+                    return new();
+                }
+
+                var result = await response.Content.ReadFromJsonAsync<List<Entry>>();
+                return result ?? new();
             }
             finally
             {
